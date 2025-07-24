@@ -14,7 +14,7 @@ public class Room {
     private Long id;
 
     private Long pgId;             // FK to PG (optional: @ManyToOne)
-
+    private String imageUrl;
     private String sharing;
     private boolean isAc;
     private String description;
