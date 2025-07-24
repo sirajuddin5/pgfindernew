@@ -15,7 +15,7 @@ public class Booking {
     private Long id;
 
     private Long roomId;
-    private Long userId;
+    private String userId;
     private Long pgId;
 
     private LocalDate visitDate;

@@ -12,9 +12,7 @@ public class PGMapper {
         pg.setAddress(dto.getAddress());
         pg.setDescription(dto.getDescription());
         pg.setImageUrl(dto.getImageUrl());
-
-        // Convert String to Long
-        pg.setUserId(String.valueOf(Long.parseLong(dto.getUserId())));
+        pg.setUserId(dto.getUserId());
         return pg;
     }
 
@@ -25,9 +23,7 @@ public class PGMapper {
                 pg.getAddress(),
                 pg.getDescription(),
                 pg.getImageUrl(),
-
-                // Convert Long to String
-                String.valueOf(pg.getUserId())
+                pg.getUserId()
         );
     }
 

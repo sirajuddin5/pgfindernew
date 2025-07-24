@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 
-public interface PGRepository extends JpaRepository<PG, Long> {
+public interface PGRepository extends JpaRepository<PG, String> {
     List<PG> findByUserId(String userId);
 }

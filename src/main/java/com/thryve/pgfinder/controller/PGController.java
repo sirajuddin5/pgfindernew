@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/pgs")
+@RequestMapping("/v1/pgs")
 @RequiredArgsConstructor
 public class PGController {
     private final PGService pgService;
