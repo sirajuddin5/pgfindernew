@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @RestController
 @RequestMapping("/v1/pgs")
@@ -17,9 +16,6 @@ public class PGController {
     private final PGService pgService;
 
     @PostMapping
-//    public ResponseEntity<PGResponse> create(@RequestBody PGRequest dto) {
-//        return ResponseEntity.ok(pgService.createPG(dto));
-//    }
     public  ResponseEntity<Object> create(@RequestBody PGRequest dto){
 
         return PGResponseHandler.ResponseBuilder("PG Added", HttpStatus.CREATED, pgService.createPG(dto));
@@ -27,7 +23,6 @@ public class PGController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<Object> list(@PathVariable String userId) {
-//        return ResponseEntity.ok(pgService.getPGsByUser(userId));
         return PGResponseHandler.ResponseBuilder("Requested PG Details", HttpStatus.OK, pgService.getPGsByUser(userId));
     }
 }
