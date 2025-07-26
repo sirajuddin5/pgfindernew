@@ -12,11 +12,11 @@ import java.time.LocalDate;
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    private Long roomId;
+    private String roomId;
     private String userId;
-    private Long pgId;
+    private String pgId;
 
     private LocalDate visitDate;
 }

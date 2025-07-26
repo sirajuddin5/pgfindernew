@@ -5,7 +5,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PGResponse {
-    private String PGid;
+    private String pgId;
     private String name;
     private String address;
     private String description;

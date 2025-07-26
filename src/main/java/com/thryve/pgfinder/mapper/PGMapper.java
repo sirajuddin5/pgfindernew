@@ -18,7 +18,7 @@ public class PGMapper {
 
     public static PGResponse toDto(PG pg) {
         return new PGResponse(
-                String.valueOf(pg.getId()),
+                pg.getId(),
                 pg.getName(),
                 pg.getAddress(),
                 pg.getDescription(),
