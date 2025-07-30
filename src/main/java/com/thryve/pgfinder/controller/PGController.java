@@ -19,15 +19,18 @@ import java.util.Map;
 public class PGController {
     private final PGService pgService;
 
-    @PostMapping
+    @PostMapping("/create")
     public  ResponseEntity<Object> create(@RequestBody PGRequest dto){
-
         return PGResponseHandler.ResponseBuilder("PG Added", HttpStatus.CREATED, pgService.createPG(dto));
     }
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<Object> list(@PathVariable String userId) {
         return PGResponseHandler.ResponseBuilder("Requested PG Details", HttpStatus.OK, pgService.getPGsByUser(userId));
+    }
+    @PostMapping("/update/{pgId}")
+    public ResponseEntity<Object> update(@RequestBody PGRequest dto){
+        return  PGResponseHandler.ResponseBuilder("PG Updated", HttpStatus.OK, pgService.updatePG(dto));
     }
     @ExceptionHandler(PGAlreadyExistException.class)
         public ResponseEntity<Object> handleDuplicatePG(PGAlreadyExistException ex){

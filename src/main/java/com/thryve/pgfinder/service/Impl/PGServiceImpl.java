@@ -36,6 +36,18 @@ public class PGServiceImpl implements PGService {
         PG savedPG = pgRepository.save(pg);
         return PGMapper.toDto(savedPG);
     }
+    @Override
+    public PGResponse updatePG(PGRequest dto){
+        String name = dto.getName().trim().toLowerCase();
+        String address = dto.getAddress().trim().toLowerCase();
+        Optional <PG> existingPg = pgRepository.findByNameAndAddress(name, address);
+        if(existingPg.isPresent()){
+            throw  new PGAlreadyExistException("This PG is already listed with the same name and address.");
+        }
+        PG pg = PGMapper.toEntity(dto);
+        PG savedPg = pgRepository.save(pg);
+        return  PGMapper.toDto(savedPg);
+    }
 
     @Override
     public List<PGResponse> getPGsByUser(String userId) {

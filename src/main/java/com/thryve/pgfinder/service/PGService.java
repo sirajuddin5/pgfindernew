@@ -7,5 +7,6 @@ import java.util.List;
 public interface PGService {
     PGResponse createPG(PGRequest dto);
     List<PGResponse> getPGsByUser(String userId);
+    PGResponse updatePG( PGRequest dto);
 }
 
