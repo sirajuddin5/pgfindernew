@@ -33,10 +33,12 @@ public class PGController {
     public ResponseEntity<Object> list(@PathVariable String userId) {
         return PGResponseHandler.ResponseBuilder("Requested PG Details", HttpStatus.OK, pgService.getPGsByUser(userId));
     }
+
     @PostMapping("/update-pg/{pgId}")
     public ResponseEntity<Object> update(@RequestBody PGRequest dto){
         return  PGResponseHandler.ResponseBuilder("PG Updated", HttpStatus.OK, pgService.updatePG(dto));
     }
+
     @ExceptionHandler(PGAlreadyExistException.class)
         public ResponseEntity<Object> handleDuplicatePG(PGAlreadyExistException ex){
             Map<String, Object> body = new HashMap<>();
