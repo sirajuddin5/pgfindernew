@@ -19,7 +19,7 @@ import java.util.Map;
 public class PGController {
     private final PGService pgService;
 
-    @PostMapping("/create")
+    @PostMapping("/create-pg")
     public  ResponseEntity<Object> create(@RequestBody PGRequest dto){
         return PGResponseHandler.ResponseBuilder("PG Added", HttpStatus.CREATED, pgService.createPG(dto));
     }
@@ -33,7 +33,7 @@ public class PGController {
     public ResponseEntity<Object> list(@PathVariable String userId) {
         return PGResponseHandler.ResponseBuilder("Requested PG Details", HttpStatus.OK, pgService.getPGsByUser(userId));
     }
-    @PostMapping("/update/{pgId}")
+    @PostMapping("/update-pg/{pgId}")
     public ResponseEntity<Object> update(@RequestBody PGRequest dto){
         return  PGResponseHandler.ResponseBuilder("PG Updated", HttpStatus.OK, pgService.updatePG(dto));
     }
