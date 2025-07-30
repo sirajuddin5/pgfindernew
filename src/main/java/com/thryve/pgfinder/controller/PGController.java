@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/v1/pgs")
+@RequestMapping("/v1/user")
 @RequiredArgsConstructor
 public class PGController {
     private final PGService pgService;
@@ -24,12 +24,12 @@ public class PGController {
         return PGResponseHandler.ResponseBuilder("PG Added", HttpStatus.CREATED, pgService.createPG(dto));
     }
 
-    @GetMapping("/user/all-pgs")
+    @GetMapping("/all-pgs")
     public ResponseEntity<Object> ListAllpG(){
         return PGResponseHandler.ResponseBuilder("All PG details", HttpStatus.OK, pgService.getAllPgs());
     }
 
-    @GetMapping("/user/{userId}/owned-pgs")
+    @GetMapping("/owned-pgs/{userId}")
     public ResponseEntity<Object> list(@PathVariable String userId) {
         return PGResponseHandler.ResponseBuilder("Requested PG Details", HttpStatus.OK, pgService.getPGsByUser(userId));
     }
