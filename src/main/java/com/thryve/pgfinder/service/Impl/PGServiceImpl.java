@@ -56,4 +56,9 @@ public class PGServiceImpl implements PGService {
                 .map(PGMapper::toDto)
                 .collect(Collectors.toList());
     }
+    @Override
+    public List<PG> getAllPgs(){
+        return  pgRepository.findAll();
+
+    }
 }

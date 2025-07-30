@@ -24,7 +24,12 @@ public class PGController {
         return PGResponseHandler.ResponseBuilder("PG Added", HttpStatus.CREATED, pgService.createPG(dto));
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user/all-pgs")
+    public ResponseEntity<Object> ListAllpG(){
+        return PGResponseHandler.ResponseBuilder("All PG details", HttpStatus.OK, pgService.getAllPgs());
+    }
+
+    @GetMapping("/user/{userId}/owned-pgs")
     public ResponseEntity<Object> list(@PathVariable String userId) {
         return PGResponseHandler.ResponseBuilder("Requested PG Details", HttpStatus.OK, pgService.getPGsByUser(userId));
     }
