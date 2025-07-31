@@ -11,11 +11,11 @@ import lombok.*;
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    private Long roomId;
-    private Long userId;
-    private Long pgId;
+    private String roomId;
+    private String userId;
+    private String pgId;
 
     private String comment;
     private int rating;

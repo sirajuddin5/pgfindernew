@@ -2,6 +2,7 @@ package com.thryve.pgfinder.service.Impl;
 
 import com.thryve.pgfinder.dto.request.PGRequest;
 import com.thryve.pgfinder.dto.response.PGResponse;
+import com.thryve.pgfinder.exception.PGAlreadyExistException;
 import com.thryve.pgfinder.mapper.PGMapper;
 import com.thryve.pgfinder.model.PG;
 import com.thryve.pgfinder.repository.PGRepository;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,9 +22,31 @@ public class PGServiceImpl implements PGService {
 
     @Override
     public PGResponse createPG(PGRequest dto) {
+        // Trim and normalize input to avoid duplicate entries with casing or spaces
+        String name = dto.getName().trim().toLowerCase();
+        String address = dto.getAddress().trim().toLowerCase();
+
+        Optional<PG> existingPg = pgRepository.findByNameAndAddress(name, address);
+        if (existingPg.isPresent()) {
+            throw new PGAlreadyExistException("This PG is already listed with the same name and address.");
+        }
+
+        // Map DTO to entity and save
         PG pg = PGMapper.toEntity(dto);
         PG savedPG = pgRepository.save(pg);
         return PGMapper.toDto(savedPG);
+    }
+    @Override
+    public PGResponse updatePG(PGRequest dto){
+        String name = dto.getName().trim().toLowerCase();
+        String address = dto.getAddress().trim().toLowerCase();
+        Optional <PG> existingPg = pgRepository.findByNameAndAddress(name, address);
+        if(existingPg.isPresent()){
+            throw  new PGAlreadyExistException("This PG is already listed with the same name and address.");
+        }
+        PG pg = PGMapper.toEntity(dto);
+        PG savedPg = pgRepository.save(pg);
+        return  PGMapper.toDto(savedPg);
     }
 
     @Override
@@ -31,5 +55,10 @@ public class PGServiceImpl implements PGService {
                 .stream()
                 .map(PGMapper::toDto)
                 .collect(Collectors.toList());
+    }
+    @Override
+    public List<PG> getAllPgs(){
+        return  pgRepository.findAll();
+
     }
 }

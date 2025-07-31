@@ -12,22 +12,18 @@ public class PGMapper {
         pg.setAddress(dto.getAddress());
         pg.setDescription(dto.getDescription());
         pg.setImageUrl(dto.getImageUrl());
-
-        // Convert String to Long
-        pg.setUserId(String.valueOf(Long.parseLong(dto.getUserId())));
+        pg.setUserId(dto.getUserId());
         return pg;
     }
 
     public static PGResponse toDto(PG pg) {
         return new PGResponse(
-                String.valueOf(pg.getId()),
+                pg.getId(),
                 pg.getName(),
                 pg.getAddress(),
                 pg.getDescription(),
                 pg.getImageUrl(),
-
-                // Convert Long to String
-                String.valueOf(pg.getUserId())
+                pg.getUserId()
         );
     }
 

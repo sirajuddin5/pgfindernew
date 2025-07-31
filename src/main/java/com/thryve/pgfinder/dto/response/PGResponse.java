@@ -5,10 +5,11 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PGResponse {
-    private String id;
+    private String pgId;
     private String name;
     private String address;
     private String description;
     private String imageUrl;
     private String userId;
 }
+// need to write a function pg create once name and adddress should be different before creation
