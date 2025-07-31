@@ -11,7 +11,7 @@ import lombok.*;
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private String roomId;
 
     private String pgId;             // FK to PG (optional: @ManyToOne)
     private String imageUrl;
