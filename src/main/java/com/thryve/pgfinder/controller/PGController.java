@@ -3,7 +3,7 @@ package com.thryve.pgfinder.controller;
 import com.thryve.pgfinder.dto.request.PGRequest;
 import com.thryve.pgfinder.dto.response.PGResponseHandler;
 
-import com.thryve.pgfinder.exception.PGAlreadyExistException;
+import com.thryve.pgfinder.exception.AlreadyExistException;
 import com.thryve.pgfinder.model.common.FetchAPIRequest;
 
 import com.thryve.pgfinder.service.PGService;
