@@ -1,9 +1,8 @@
 package com.thryve.pgfinder.controller;
 
 import com.thryve.pgfinder.dto.request.PGRequest;
-import com.thryve.pgfinder.dto.response.PGResponse;
 import com.thryve.pgfinder.dto.response.PGResponseHandler;
-import com.thryve.pgfinder.exception.PGAlreadyExistException;
+import com.thryve.pgfinder.exception.AlreadyExistException;
 import com.thryve.pgfinder.service.PGService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -39,8 +38,8 @@ public class PGController {
         return  PGResponseHandler.ResponseBuilder("PG Updated", HttpStatus.OK, pgService.updatePG(dto));
     }
 
-    @ExceptionHandler(PGAlreadyExistException.class)
-        public ResponseEntity<Object> handleDuplicatePG(PGAlreadyExistException ex){
+    @ExceptionHandler(AlreadyExistException.class)
+        public ResponseEntity<Object> handleDuplicatePG(AlreadyExistException ex){
             Map<String, Object> body = new HashMap<>();
             body.put("status", HttpStatus.CONFLICT.value());
             body.put("message", ex.getMessage());

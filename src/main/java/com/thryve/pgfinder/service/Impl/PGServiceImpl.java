@@ -2,7 +2,7 @@ package com.thryve.pgfinder.service.Impl;
 
 import com.thryve.pgfinder.dto.request.PGRequest;
 import com.thryve.pgfinder.dto.response.PGResponse;
-import com.thryve.pgfinder.exception.PGAlreadyExistException;
+import com.thryve.pgfinder.exception.AlreadyExistException;
 import com.thryve.pgfinder.mapper.PGMapper;
 import com.thryve.pgfinder.model.PG;
 import com.thryve.pgfinder.repository.PGRepository;
@@ -28,7 +28,7 @@ public class PGServiceImpl implements PGService {
 
         Optional<PG> existingPg = pgRepository.findByNameAndAddress(name, address);
         if (existingPg.isPresent()) {
-            throw new PGAlreadyExistException("This PG is already listed with the same name and address.");
+            throw new AlreadyExistException("This PG is already listed with the same name and address.");
         }
 
         // Map DTO to entity and save
@@ -42,7 +42,7 @@ public class PGServiceImpl implements PGService {
         String address = dto.getAddress().trim().toLowerCase();
         Optional <PG> existingPg = pgRepository.findByNameAndAddress(name, address);
         if(existingPg.isPresent()){
-            throw  new PGAlreadyExistException("This PG is already listed with the same name and address.");
+            throw  new AlreadyExistException("This PG is already listed with the same name and address.");
         }
         PG pg = PGMapper.toEntity(dto);
         PG savedPg = pgRepository.save(pg);
