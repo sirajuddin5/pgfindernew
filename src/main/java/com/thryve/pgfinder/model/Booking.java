@@ -12,7 +12,7 @@ import java.time.LocalDate;
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private String bookingId;
 
     private String roomId;
     private String userId;
