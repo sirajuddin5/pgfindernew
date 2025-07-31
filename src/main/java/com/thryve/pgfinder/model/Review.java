@@ -11,7 +11,7 @@ import lombok.*;
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private String reviewId;
 
     private String roomId;
     private String userId;
