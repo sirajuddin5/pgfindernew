@@ -2,6 +2,7 @@ package com.thryve.pgfinder.service;
 
 import com.thryve.pgfinder.dto.request.PGRequest;
 import com.thryve.pgfinder.model.common.APIResponse;
+import com.thryve.pgfinder.model.common.DeleteRequest;
 import com.thryve.pgfinder.model.common.FetchAPIRequest;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public interface PGService {
 //    APIResponse updatePg(String pgId, PGRequest pgRequest);
 
     APIResponse fetchAll(FetchAPIRequest fetchAPIRequest);
-    String deletePG(String pgId);
+//    String deletePG(String pgId);
+    DeleteRequest deletePG(String pgId);
 }
 
