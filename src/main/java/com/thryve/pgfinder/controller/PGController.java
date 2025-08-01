@@ -41,9 +41,10 @@ public class PGController {
     }
 
     @PutMapping("/update-pg/{pgId}")
-    public ResponseEntity<Object> update(@PathVariable String pgId, @RequestBody PGRequest dto) {
-        PGResponse response = pgService.updatePG(pgId, dto);
-        return PGResponseHandler.ResponseBuilder("PG Updated", HttpStatus.OK, response);
+    public ResponseEntity<?> update(@PathVariable String pgId, @RequestBody PGRequest dto) {
+//        PGResponse response = pgService.updatePG(String pgId, PGRequest dto);
+//        return PGResponseHandler.ResponseBuilder("PG Updated", HttpStatus.OK, response);
+        return ResponseEntity.ok(this.pgService.updatePG(pgId, dto));
     }
 
     @ExceptionHandler(AlreadyExistException.class)

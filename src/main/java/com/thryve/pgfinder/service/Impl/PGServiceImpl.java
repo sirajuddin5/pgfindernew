@@ -3,7 +3,6 @@ package com.thryve.pgfinder.service.Impl;
 import com.thryve.pgfinder.config.validation.UtilityValidation;
 import com.thryve.pgfinder.dto.request.PGRequest;
 import com.thryve.pgfinder.dto.response.PGResponse;
-import com.thryve.pgfinder.exception.AlreadyExistException;
 import com.thryve.pgfinder.exception.ResourceNotFoundException;
 import com.thryve.pgfinder.mapper.PGMapper;
 import com.thryve.pgfinder.model.PG;
@@ -58,34 +57,34 @@ public class PGServiceImpl implements PGService {
 //         PG savedPG = pgRepository.save(pg);
 //         return PGMapper.toDto(savedPG);
 //     }
-
-    @Override
-    public PGResponse updatePG(String pgId, PGRequest dto) {
-        // 1. Fetch the existing PG by ID
-        PG existingPg = pgRepository.findById(pgId)
-                .orElseThrow(() -> new ResourceNotFoundException("PG not found with id: " + pgId));
-
-        // 2. Normalize name & address
-        String name = dto.getName().trim().toLowerCase();
-        String address = dto.getAddress().trim().toLowerCase();
-
-        // 3. Check for duplicate PG with same name/address but different ID
-        Optional<PG> duplicatePg = pgRepository.findByNameAndAddress(name, address);
-        if (duplicatePg.isPresent() && !duplicatePg.get().getId().equals(pgId)) {
-            throw new AlreadyExistException("This PG is already listed with the same name and address.");
-        }
-
-        // 4. Update fields
-        existingPg.setName(dto.getName());
-        existingPg.setAddress(dto.getAddress());
-        existingPg.setDescription(dto.getDescription());
-        existingPg.setImageUrl(dto.getImageUrl());
-        existingPg.setUserId(dto.getUserId());
-
-        // 5. Save and return response
-        PG updatedPg = pgRepository.save(existingPg);
-        return PGMapper.toDto(updatedPg);
-    }
+//_______
+//    @Override/
+//    public PGResponse updatePG(String pgId, PGRequest dto) {
+//        // 1. Fetch the existing PG by ID
+//        PG existingPg = pgRepository.findById(pgId)
+//                .orElseThrow(() -> new ResourceNotFoundException("PG not found with id: " + pgId));
+//
+//        // 2. Normalize name & address
+//        String name = dto.getName().trim().toLowerCase();
+//        String address = dto.getAddress().trim().toLowerCase();
+//
+//        // 3. Check for duplicate PG with same name/address but different ID
+//        Optional<PG> duplicatePg = pgRepository.findByNameAndAddress(name, address);
+//        if (duplicatePg.isPresent() && !duplicatePg.get().getId().equals(pgId)) {
+//            throw new AlreadyExistException("This PG is already listed with the same name and address.");
+//        }
+//
+//        // 4. Update fields
+//        existingPg.setName(dto.getName());
+//        existingPg.setAddress(dto.getAddress());
+//        existingPg.setDescription(dto.getDescription());
+//        existingPg.setImageUrl(dto.getImageUrl());
+//        existingPg.setUserId(dto.getUserId());
+//
+//        // 5. Save and return response
+//        PG updatedPg = pgRepository.save(existingPg);
+//        return PGMapper.toDto(updatedPg);
+//    }
 
 
     @Override
@@ -96,10 +95,11 @@ public class PGServiceImpl implements PGService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public PGResponse updatePG(PGRequest dto) {
-        return null;
-    }
+
+//    @Override
+//    public PGResponse updatePG(PGRequest dto) {
+//        return null;
+//    }
 
     @Override
 	public APIResponse createPG(PGRequest pgRequest) {
@@ -123,17 +123,26 @@ public class PGServiceImpl implements PGService {
                   response.setStatus("error");
                   return response;
               }
-              
+            String name = pgRequest.getName().trim().toLowerCase();
+            String address = pgRequest.getAddress().trim().toLowerCase();
+
+            Optional<PG> existingPg = pgRepository.findByNameAndAddress(name, address);
+            if (existingPg.isPresent()) {
+                response.setMessage("This PG is already listed with the same name and address.");
+                response.setStatus("error");
+                return response;
+            }
               PG pg = new PG();
-            //  pg.setId(pgRequest.getUserId());
+//              pg.setId(pgRequest.getUserId());
               pg.setName(pgRequest.getName());
               pg.setAddress(pgRequest.getAddress());
               pg.setDescription(pgRequest.getDescription());
               pg.setImageUrl(pgRequest.getImageUrl());
-              
-              PG savedPg = this.pgRepository.save(pg);
+              pg.setUserId(pgRequest.getUserId());
+
+            PG savedPg = this.pgRepository.save(pg);
               response.setResult(savedPg);
-              response.setMessage("Pg saved Succesfully");
+              response.setMessage("Pg created Succesfully");
               response.setStatus("success");;
 			
 		} catch (Exception e) {
@@ -157,6 +166,67 @@ public class PGServiceImpl implements PGService {
     	return response;
     
 	}
+
+//    @Override
+//    public PGResponse updatePG(String pgId, PGRequest dto) {
+//        return null;
+//    }
+
+    @Override
+    public APIResponse updatePG(String pgId, PGRequest pgRequest){
+        APIResponse response = new APIResponse();
+        try {
+            HashMap<String, Object> fieldsMap = new HashMap();
+            Class<?> clazz = PGRequest.class;
+            List<String> bypassList = Arrays.asList();
+
+            for(Field field : clazz.getDeclaredFields()) {
+                field.setAccessible(true);
+                if (!bypassList.contains(field.getName())) {
+                    fieldsMap.put(field.getName(), field.get(pgRequest));
+                }
+            }
+
+            HashMap<String, Object> validationResponse = this.utilityValidation.validate(fieldsMap);
+            if ((Boolean)validationResponse.get("status")) {
+                response.setMessage(validationResponse.get("message").toString());
+                response.setStatus("error");
+                return response;
+            }
+            PG existingPg = pgRepository.findById(pgId)
+                    .orElseThrow(() -> new ResourceNotFoundException("PG not found with id: " + pgId));
+
+            String name = pgRequest.getName().trim().toLowerCase();
+            String address = pgRequest.getAddress().trim().toLowerCase();
+
+            Optional<PG> duplicatePg  = pgRepository.findByNameAndAddress(name, address);
+            if (duplicatePg .isPresent()) {
+                response.setMessage("This PG is already listed with the same name and address.");
+                response.setStatus("error");
+                return response;
+            }
+
+            //  pg.setId(pgRequest.getUserId());
+            existingPg.setName(pgRequest.getName());
+            existingPg.setAddress(pgRequest.getAddress());
+            existingPg.setDescription(pgRequest.getDescription());
+            existingPg.setImageUrl(pgRequest.getImageUrl());
+            existingPg.setUserId(pgRequest.getUserId());
+
+            PG savedPg = this.pgRepository.save(existingPg);
+            response.setResult(savedPg);
+            response.setMessage("Pg updated Succesfully");
+            response.setStatus("success");;
+
+        } catch (Exception e) {
+            response.setMessage(e.getMessage());
+            response.setStatus("error");
+        }
+
+
+        return response;
+    }
+
 	@Override
 	public APIResponse fetchAll(FetchAPIRequest fetchAPIRequest) {
 		 APIResponse response = new APIResponse();
