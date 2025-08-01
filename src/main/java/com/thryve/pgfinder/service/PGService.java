@@ -18,5 +18,6 @@ public interface PGService {
 //    APIResponse updatePg(String pgId, PGRequest pgRequest);
 
     APIResponse fetchAll(FetchAPIRequest fetchAPIRequest);
+    String deletePG(String pgId);
 }
 

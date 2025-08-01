@@ -46,7 +46,11 @@ public class PGController {
 //        return PGResponseHandler.ResponseBuilder("PG Updated", HttpStatus.OK, response);
         return ResponseEntity.ok(this.pgService.updatePG(pgId, dto));
     }
-
+@DeleteMapping("/delete-pg/{pgId}")
+public String deletePG(@PathVariable("pgId") String pgID){
+pgService.deletePG(pgID);
+return "PG deleted";
+}
     @ExceptionHandler(AlreadyExistException.class)
         public ResponseEntity<Object> handleDuplicatePG(AlreadyExistException ex){
             Map<String, Object> body = new HashMap<>();
