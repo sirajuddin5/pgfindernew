@@ -2,6 +2,7 @@ package com.thryve.pgfinder.controller;
 
 import com.thryve.pgfinder.dto.request.PGRequest;
 import com.thryve.pgfinder.exception.AlreadyExistException;
+import com.thryve.pgfinder.model.common.DeleteRequest;
 import com.thryve.pgfinder.model.common.FetchAPIRequest;
 
 import com.thryve.pgfinder.service.PGService;
@@ -45,9 +46,9 @@ public class PGController {
         return ResponseEntity.ok(this.pgService.updatePG(pgId, dto));
     }
 @DeleteMapping("/delete-pg/{pgId}")
-public String deletePG(@PathVariable("pgId") String pgID){
-pgService.deletePG(pgID);
-return "PG deleted";
+public ResponseEntity<DeleteRequest> deletePG(@PathVariable("pgId") String pgID){
+DeleteRequest deleted = pgService.deletePG(pgID);
+return ResponseEntity.ok(deleted);
 }
     @ExceptionHandler(AlreadyExistException.class)
         public ResponseEntity<Object> handleDuplicatePG(AlreadyExistException ex){

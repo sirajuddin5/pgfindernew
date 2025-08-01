@@ -5,6 +5,7 @@ import com.thryve.pgfinder.dto.request.PGRequest;
 import com.thryve.pgfinder.exception.ResourceNotFoundException;
 import com.thryve.pgfinder.model.PG;
 import com.thryve.pgfinder.model.common.APIResponse;
+import com.thryve.pgfinder.model.common.DeleteRequest;
 import com.thryve.pgfinder.model.common.FetchAPIRequest;
 import com.thryve.pgfinder.model.common.filter.specification.FiltersSpecification;
 import com.thryve.pgfinder.model.common.page.PageRequestDTO;
@@ -274,8 +275,9 @@ public class PGServiceImpl implements PGService {
 		 return response;
 	}
     @Override
-	public String deletePG(String pgId){
-        pgRepository.deleteById(pgId);
-        return "Success";
+	public DeleteRequest deletePG(String pgId){
+      pgRepository.deleteById(pgId);
+      return new DeleteRequest(pgId);
+
     }
 }
