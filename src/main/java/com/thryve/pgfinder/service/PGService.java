@@ -10,6 +10,9 @@ import java.util.List;
 
 public interface PGService {
     APIResponse createPG(PGRequest pgRequest);
+
+    PGResponse updatePG(String pgId, PGRequest dto);
+
     List<PGResponse> getPGsByUser(String userId);
     PGResponse updatePG( PGRequest dto);
     APIResponse fetchAll(FetchAPIRequest fetchAPIRequest);

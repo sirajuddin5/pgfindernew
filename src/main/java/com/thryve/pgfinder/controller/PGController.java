@@ -1,6 +1,7 @@
 package com.thryve.pgfinder.controller;
 
 import com.thryve.pgfinder.dto.request.PGRequest;
+import com.thryve.pgfinder.dto.response.PGResponse;
 import com.thryve.pgfinder.dto.response.PGResponseHandler;
 
 import com.thryve.pgfinder.exception.AlreadyExistException;
@@ -39,9 +40,10 @@ public class PGController {
         return PGResponseHandler.ResponseBuilder("Requested PG Details", HttpStatus.OK, pgService.getPGsByUser(userId));
     }
 
-    @PostMapping("/update-pg/{pgId}")
-    public ResponseEntity<Object> update(@RequestBody PGRequest dto){
-        return  PGResponseHandler.ResponseBuilder("PG Updated", HttpStatus.OK, pgService.updatePG(dto));
+    @PutMapping("/update-pg/{pgId}")
+    public ResponseEntity<Object> update(@PathVariable String pgId, @RequestBody PGRequest dto) {
+        PGResponse response = pgService.updatePG(pgId, dto);
+        return PGResponseHandler.ResponseBuilder("PG Updated", HttpStatus.OK, response);
     }
 
     @ExceptionHandler(AlreadyExistException.class)
