@@ -4,6 +4,7 @@ import com.thryve.pgfinder.config.validation.UtilityValidation;
 import com.thryve.pgfinder.dto.request.PGRequest;
 import com.thryve.pgfinder.dto.response.PGResponse;
 import com.thryve.pgfinder.exception.AlreadyExistException;
+import com.thryve.pgfinder.exception.ResourceNotFoundException;
 import com.thryve.pgfinder.mapper.PGMapper;
 import com.thryve.pgfinder.model.PG;
 import com.thryve.pgfinder.model.common.APIResponse;
@@ -59,17 +60,33 @@ public class PGServiceImpl implements PGService {
 //     }
 
     @Override
-    public PGResponse updatePG(PGRequest dto){
+    public PGResponse updatePG(String pgId, PGRequest dto) {
+        // 1. Fetch the existing PG by ID
+        PG existingPg = pgRepository.findById(pgId)
+                .orElseThrow(() -> new ResourceNotFoundException("PG not found with id: " + pgId));
+
+        // 2. Normalize name & address
         String name = dto.getName().trim().toLowerCase();
         String address = dto.getAddress().trim().toLowerCase();
-        Optional <PG> existingPg = pgRepository.findByNameAndAddress(name, address);
-        if(existingPg.isPresent()){
-            throw  new AlreadyExistException("This PG is already listed with the same name and address.");
+
+        // 3. Check for duplicate PG with same name/address but different ID
+        Optional<PG> duplicatePg = pgRepository.findByNameAndAddress(name, address);
+        if (duplicatePg.isPresent() && !duplicatePg.get().getId().equals(pgId)) {
+            throw new AlreadyExistException("This PG is already listed with the same name and address.");
         }
-        PG pg = PGMapper.toEntity(dto);
-        PG savedPg = pgRepository.save(pg);
-        return  PGMapper.toDto(savedPg);
+
+        // 4. Update fields
+        existingPg.setName(dto.getName());
+        existingPg.setAddress(dto.getAddress());
+        existingPg.setDescription(dto.getDescription());
+        existingPg.setImageUrl(dto.getImageUrl());
+        existingPg.setUserId(dto.getUserId());
+
+        // 5. Save and return response
+        PG updatedPg = pgRepository.save(existingPg);
+        return PGMapper.toDto(updatedPg);
     }
+
 
     @Override
     public List<PGResponse> getPGsByUser(String userId) {
@@ -78,7 +95,13 @@ public class PGServiceImpl implements PGService {
                 .map(PGMapper::toDto)
                 .collect(Collectors.toList());
     }
-	@Override
+
+    @Override
+    public PGResponse updatePG(PGRequest dto) {
+        return null;
+    }
+
+    @Override
 	public APIResponse createPG(PGRequest pgRequest) {
 		APIResponse response = new APIResponse();
     	
