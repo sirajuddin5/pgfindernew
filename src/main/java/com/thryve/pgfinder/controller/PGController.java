@@ -1,9 +1,6 @@
 package com.thryve.pgfinder.controller;
 
 import com.thryve.pgfinder.dto.request.PGRequest;
-import com.thryve.pgfinder.dto.response.PGResponse;
-import com.thryve.pgfinder.dto.response.PGResponseHandler;
-
 import com.thryve.pgfinder.exception.AlreadyExistException;
 import com.thryve.pgfinder.model.common.FetchAPIRequest;
 
@@ -35,10 +32,11 @@ public class PGController {
         return ResponseEntity.ok(this.pgService.fetchAll(fetchAPIRequest));
     }
 
-    @GetMapping("/owned-pgs/{userId}")
-    public ResponseEntity<Object> list(@PathVariable String userId) {
-        return PGResponseHandler.ResponseBuilder("Requested PG Details", HttpStatus.OK, pgService.getPGsByUser(userId));
+    @PostMapping("/owned-pgs/{userId}")
+    public ResponseEntity<Object> list(@PathVariable String userId, @RequestBody FetchAPIRequest fetchAPIRequest) {
+        return ResponseEntity.ok(this.pgService.getPGsByUser(userId, fetchAPIRequest));
     }
+
 
     @PutMapping("/update-pg/{pgId}")
     public ResponseEntity<?> update(@PathVariable String pgId, @RequestBody PGRequest dto) {
