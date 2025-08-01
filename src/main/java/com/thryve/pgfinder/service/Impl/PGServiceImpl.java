@@ -248,5 +248,9 @@ public class PGServiceImpl implements PGService {
 		 
 		 return response;
 	}
-	
+    @Override
+	public String deletePG(String pgId){
+        pgRepository.deleteById(pgId);
+        return "Success";
+    }
 }
