@@ -1,7 +1,6 @@
 package com.thryve.pgfinder.service;
 
 import com.thryve.pgfinder.dto.request.PGRequest;
-import com.thryve.pgfinder.dto.response.PGResponse;
 import com.thryve.pgfinder.model.common.APIResponse;
 import com.thryve.pgfinder.model.common.FetchAPIRequest;
 

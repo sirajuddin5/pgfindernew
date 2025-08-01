@@ -1,9 +1,6 @@
 package com.thryve.pgfinder.controller;
 
 import com.thryve.pgfinder.dto.request.PGRequest;
-import com.thryve.pgfinder.dto.response.PGResponse;
-import com.thryve.pgfinder.dto.response.PGResponseHandler;
-
 import com.thryve.pgfinder.exception.AlreadyExistException;
 import com.thryve.pgfinder.model.common.FetchAPIRequest;
 
