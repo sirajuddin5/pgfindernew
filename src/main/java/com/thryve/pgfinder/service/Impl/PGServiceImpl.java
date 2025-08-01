@@ -2,9 +2,7 @@ package com.thryve.pgfinder.service.Impl;
 
 import com.thryve.pgfinder.config.validation.UtilityValidation;
 import com.thryve.pgfinder.dto.request.PGRequest;
-import com.thryve.pgfinder.dto.response.PGResponse;
 import com.thryve.pgfinder.exception.ResourceNotFoundException;
-import com.thryve.pgfinder.mapper.PGMapper;
 import com.thryve.pgfinder.model.PG;
 import com.thryve.pgfinder.model.common.APIResponse;
 import com.thryve.pgfinder.model.common.FetchAPIRequest;
@@ -25,7 +23,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -88,12 +85,37 @@ public class PGServiceImpl implements PGService {
 
 
     @Override
-    public List<PGResponse> getPGsByUser(String userId) {
-        return pgRepository.findByUserId(userId)
-                .stream()
-                .map(PGMapper::toDto)
-                .collect(Collectors.toList());
+    public APIResponse getPGsByUser(String userId, FetchAPIRequest fetchAPIRequest) {
+        APIResponse response = new APIResponse();
+
+        try {
+            Specification<PG> searchSpecification = this.pgFiltersSpecification
+                    .getSearchSpecification(fetchAPIRequest.getFilterList(), fetchAPIRequest.getGlobalOperator());
+
+            Specification<PG> userIdSpec = (root, query, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("userId"), userId);
+
+            Specification<PG> finalSpec = (searchSpecification == null)
+                    ? userIdSpec
+                    : searchSpecification.and(userIdSpec);
+
+            Pageable pageable = new PageRequestDTO().getPageable(fetchAPIRequest.getPageRequestDTO());
+
+            Page<PG> pgPage = pgRepository.findAll(finalSpec, pageable);
+
+            response.setResult(pgPage);
+            response.setMessage("PGs fetched successfully.");
+            response.setStatus("success");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setMessage("Error: " + e.getMessage());
+            response.setStatus("error");
+        }
+
+        return response;
     }
+
 
 
 //    @Override
@@ -227,7 +249,10 @@ public class PGServiceImpl implements PGService {
         return response;
     }
 
-	@Override
+
+
+
+    @Override
 	public APIResponse fetchAll(FetchAPIRequest fetchAPIRequest) {
 		 APIResponse response = new APIResponse();
 		 
