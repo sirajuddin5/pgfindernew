@@ -11,7 +11,6 @@ import java.util.Optional;
 
 
 public interface PGRepository extends JpaRepository<PG, String> ,JpaSpecificationExecutor<PG> {
-    List<PG> findByUserId(String userId);
 
     @Query("SELECT p FROM PG p WHERE LOWER(TRIM(p.name)) = LOWER(TRIM(:name)) AND LOWER(TRIM(p.address)) = LOWER(TRIM(:address))")
     Optional<PG> findByNameAndAddress(@Param("name") String name, @Param("address") String address);
