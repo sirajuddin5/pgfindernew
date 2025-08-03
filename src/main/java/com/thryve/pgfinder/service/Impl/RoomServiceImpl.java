@@ -2,12 +2,14 @@ package com.thryve.pgfinder.service.Impl;
 
 import com.thryve.pgfinder.config.validation.UtilityValidation;
 import com.thryve.pgfinder.dto.request.RoomRequest;
+import com.thryve.pgfinder.model.PG;
 import com.thryve.pgfinder.model.Room;
 import com.thryve.pgfinder.model.common.APIResponse;
 import com.thryve.pgfinder.model.common.DeleteRequest;
 import com.thryve.pgfinder.model.common.FetchAPIRequest;
 import com.thryve.pgfinder.model.common.filter.specification.FiltersSpecification;
-import com.thryve.pgfinder.repository.RoomReposoitory;
+import com.thryve.pgfinder.repository.PGRepository;
+import com.thryve.pgfinder.repository.RoomRepository;
 import com.thryve.pgfinder.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,7 @@ import java.util.*;
 public class RoomServiceImpl implements RoomService {
 
     @Autowired
-    private final RoomReposoitory roomReposoitory;
+    private final RoomRepository roomRepository;
 
     @Autowired
     private final UtilityValidation utilityValidation;
@@ -29,20 +31,26 @@ public class RoomServiceImpl implements RoomService {
     @Autowired
     private final FiltersSpecification<Room> roomFiltersSpecification;
 
+    @Autowired
+    private final PGRepository pgRepository;
+
     @Override
     public APIResponse createRoom(RoomRequest roomRequest) {
+        // Check if PG exists
+
         APIResponse response = new APIResponse();
 
         try {
+            PG pg = pgRepository.findById(roomRequest.getPgId())
+                    .orElseThrow(() -> new RuntimeException("PG not found"));
+
             HashMap<String, Object> fieldsMap = new HashMap();
             Class<?> clazz = RoomRequest.class;
             List<String> bypassList = Arrays.asList();
 
             for(Field field : clazz.getDeclaredFields()) {
                 field.setAccessible(true);
-                if (!bypassList.contains(field.getName())) {
-                    fieldsMap.put(field.getName(), field.get(roomRequest));
-                }
+                fieldsMap.put(field.getName(), field.get(roomRequest));
             }
 
             HashMap<String, Object> validationResponse = this.utilityValidation.validate(fieldsMap);
@@ -54,7 +62,7 @@ public class RoomServiceImpl implements RoomService {
             String sharing = roomRequest.getSharing().trim().toLowerCase();
             boolean isAc = roomRequest.isAc();
 
-            Optional<Room> existingRoom = roomReposoitory.findBySharingAndIsAc(sharing, isAc);
+            Optional<Room> existingRoom = roomRepository.findBySharingAndIsAcAndPgId(sharing, isAc, roomRequest.getPgId());
             if (existingRoom.isPresent()) {
                 response.setMessage("This Room is already active.");
                 response.setStatus("error");
@@ -68,10 +76,10 @@ public class RoomServiceImpl implements RoomService {
             room.setPrice(roomRequest.getPrice());
             room.setDescription(roomRequest.getDescription());
             room.setImageUrl(roomRequest.getImageUrl());
-            room.setPgId(roomRequest.getPgId());
+            room.setPg(pg);
 
 
-            Room savedRoom = this.roomReposoitory.save(room);
+            Room savedRoom = this.roomRepository.save(room);
             response.setResult(savedRoom);
             response.setMessage("Room Added Succesfully");
             response.setStatus("success");;

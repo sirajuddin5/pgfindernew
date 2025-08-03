@@ -1,9 +1,6 @@
 package com.thryve.pgfinder.controller;
 
-import com.thryve.pgfinder.config.validation.UtilityValidation;
 import com.thryve.pgfinder.dto.request.RoomRequest;
-import com.thryve.pgfinder.model.common.filter.specification.FiltersSpecification;
-import com.thryve.pgfinder.repository.RoomReposoitory;
 import com.thryve.pgfinder.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
