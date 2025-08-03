@@ -1,17 +1,16 @@
 package com.thryve.pgfinder.repository;
 
 import com.thryve.pgfinder.model.PG;
+import com.thryve.pgfinder.model.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
 
+public interface RoomReposoitory extends JpaRepository<Room, String>, JpaSpecificationExecutor<Room> {
 
-public interface PGRepository extends JpaRepository<PG, String> ,JpaSpecificationExecutor<PG> {
-
-    @Query("SELECT p FROM PG p WHERE LOWER(TRIM(p.name)) = LOWER(TRIM(:name)) AND LOWER(TRIM(p.address)) = LOWER(TRIM(:address))")
-    Optional<PG> findByNameAndAddress(@Param("name") String name, @Param("address") String address);
+    @Query("SELECT r FROM Room r WHERE LOWER(TRIM(r.sharing)) = LOWER(TRIM(:sharing)) AND r.isAc = :isAc")
+    Optional<Room> findBySharingAndIsAc(@Param("sharing") String sharing, @Param("isAc") boolean isAc);
 }
