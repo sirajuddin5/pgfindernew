@@ -9,7 +9,7 @@ import com.thryve.pgfinder.model.common.DeleteRequest;
 import com.thryve.pgfinder.model.common.FetchAPIRequest;
 import com.thryve.pgfinder.model.common.filter.specification.FiltersSpecification;
 import com.thryve.pgfinder.repository.PGRepository;
-import com.thryve.pgfinder.repository.RoomReposoitory;
+import com.thryve.pgfinder.repository.RoomRepository;
 import com.thryve.pgfinder.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ import java.util.*;
 public class RoomServiceImpl implements RoomService {
 
     @Autowired
-    private final RoomReposoitory roomReposoitory;
+    private final RoomRepository roomRepository;
 
     @Autowired
     private final UtilityValidation utilityValidation;
@@ -50,9 +50,7 @@ public class RoomServiceImpl implements RoomService {
 
             for(Field field : clazz.getDeclaredFields()) {
                 field.setAccessible(true);
-                if (!bypassList.contains(field.getName())) {
-                    fieldsMap.put(field.getName(), field.get(roomRequest));
-                }
+                fieldsMap.put(field.getName(), field.get(roomRequest));
             }
 
             HashMap<String, Object> validationResponse = this.utilityValidation.validate(fieldsMap);
@@ -64,7 +62,7 @@ public class RoomServiceImpl implements RoomService {
             String sharing = roomRequest.getSharing().trim().toLowerCase();
             boolean isAc = roomRequest.isAc();
 
-            Optional<Room> existingRoom = roomReposoitory.findBySharingAndIsAcAndPgId(sharing, isAc, roomRequest.getPgId());
+            Optional<Room> existingRoom = roomRepository.findBySharingAndIsAcAndPgId(sharing, isAc, roomRequest.getPgId());
             if (existingRoom.isPresent()) {
                 response.setMessage("This Room is already active.");
                 response.setStatus("error");
@@ -81,7 +79,7 @@ public class RoomServiceImpl implements RoomService {
             room.setPg(pg);
 
 
-            Room savedRoom = this.roomReposoitory.save(room);
+            Room savedRoom = this.roomRepository.save(room);
             response.setResult(savedRoom);
             response.setMessage("Room Added Succesfully");
             response.setStatus("success");;
