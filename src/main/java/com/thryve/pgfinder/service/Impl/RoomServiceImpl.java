@@ -2,11 +2,13 @@ package com.thryve.pgfinder.service.Impl;
 
 import com.thryve.pgfinder.config.validation.UtilityValidation;
 import com.thryve.pgfinder.dto.request.RoomRequest;
+import com.thryve.pgfinder.model.PG;
 import com.thryve.pgfinder.model.Room;
 import com.thryve.pgfinder.model.common.APIResponse;
 import com.thryve.pgfinder.model.common.DeleteRequest;
 import com.thryve.pgfinder.model.common.FetchAPIRequest;
 import com.thryve.pgfinder.model.common.filter.specification.FiltersSpecification;
+import com.thryve.pgfinder.repository.PGRepository;
 import com.thryve.pgfinder.repository.RoomReposoitory;
 import com.thryve.pgfinder.service.RoomService;
 import lombok.RequiredArgsConstructor;
@@ -29,11 +31,19 @@ public class RoomServiceImpl implements RoomService {
     @Autowired
     private final FiltersSpecification<Room> roomFiltersSpecification;
 
+    @Autowired
+    private final PGRepository pgRepository;
+
     @Override
     public APIResponse createRoom(RoomRequest roomRequest) {
+        // Check if PG exists
+
         APIResponse response = new APIResponse();
 
         try {
+            PG pg = pgRepository.findById(roomRequest.getPgId())
+                    .orElseThrow(() -> new RuntimeException("PG not found"));
+
             HashMap<String, Object> fieldsMap = new HashMap();
             Class<?> clazz = RoomRequest.class;
             List<String> bypassList = Arrays.asList();
@@ -68,7 +78,7 @@ public class RoomServiceImpl implements RoomService {
             room.setPrice(roomRequest.getPrice());
             room.setDescription(roomRequest.getDescription());
             room.setImageUrl(roomRequest.getImageUrl());
-            room.setPgId(roomRequest.getPgId());
+            room.setPg(pg);
 
 
             Room savedRoom = this.roomReposoitory.save(room);

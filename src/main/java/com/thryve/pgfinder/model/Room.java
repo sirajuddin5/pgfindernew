@@ -13,12 +13,18 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
 
-    private String pgId;             // FK to PG (optional: @ManyToOne)
     private String imageUrl;
     private String sharing;
     private boolean isAc;
     private String description;
     private double price;
+
+//    private String pgId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pg_id")
+
+//    @JoinColumn(name = "pgId", referencedColumnName = "id", insertable = false, updatable = false)
+    private PG pg;
 
     public String getId() {
         return id;
@@ -26,14 +32,6 @@ public class Room {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getPgId() {
-        return pgId;
-    }
-
-    public void setPgId(String pgId) {
-        this.pgId = pgId;
     }
 
     public String getImageUrl() {
