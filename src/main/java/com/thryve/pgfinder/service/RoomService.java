@@ -1,4 +1,14 @@
 package com.thryve.pgfinder.service;
 
-public class RoomService {
+import com.thryve.pgfinder.dto.request.RoomRequest;
+import com.thryve.pgfinder.model.common.APIResponse;
+import com.thryve.pgfinder.model.common.DeleteRequest;
+import com.thryve.pgfinder.model.common.FetchAPIRequest;
+
+public interface RoomService {
+    APIResponse createRoom(RoomRequest roomRequest);
+//    APIResponse updateRoom(RoomRequest roomRequest);
+//    APIResponse roomByPg(RoomRequest roomRequest);
+//    APIResponse getAllRooms(FetchAPIRequest fetchAPIRequest);
+//    DeleteRequest deleteRoom(String roomId);
 }
