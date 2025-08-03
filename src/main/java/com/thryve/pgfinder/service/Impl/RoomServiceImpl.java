@@ -64,7 +64,7 @@ public class RoomServiceImpl implements RoomService {
             String sharing = roomRequest.getSharing().trim().toLowerCase();
             boolean isAc = roomRequest.isAc();
 
-            Optional<Room> existingRoom = roomReposoitory.findBySharingAndIsAc(sharing, isAc);
+            Optional<Room> existingRoom = roomReposoitory.findBySharingAndIsAcAndPgId(sharing, isAc, roomRequest.getPgId());
             if (existingRoom.isPresent()) {
                 response.setMessage("This Room is already active.");
                 response.setStatus("error");
