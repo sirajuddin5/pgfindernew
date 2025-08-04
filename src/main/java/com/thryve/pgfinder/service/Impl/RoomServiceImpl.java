@@ -2,6 +2,7 @@ package com.thryve.pgfinder.service.Impl;
 
 import com.thryve.pgfinder.config.validation.UtilityValidation;
 import com.thryve.pgfinder.dto.request.RoomRequest;
+import com.thryve.pgfinder.exception.ResourceNotFoundException;
 import com.thryve.pgfinder.model.PG;
 import com.thryve.pgfinder.model.Room;
 import com.thryve.pgfinder.model.common.APIResponse;
@@ -12,6 +13,7 @@ import com.thryve.pgfinder.repository.PGRepository;
 import com.thryve.pgfinder.repository.RoomRepository;
 import com.thryve.pgfinder.service.RoomService;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -92,10 +94,76 @@ public class RoomServiceImpl implements RoomService {
         return response;
     }
 //
-//    @Override
-//    public APIResponse updateRoom(RoomRequest roomRequest) {
-//        return null;
-//    }
+//    @SneakyThrows
+    @Override
+    public APIResponse updateRoom(String roomId, RoomRequest roomRequest) {
+        APIResponse response = new APIResponse();
+        try {
+            PG pg = pgRepository.findById(roomRequest.getPgId())
+                    .orElseThrow(() -> new RuntimeException("PG not found"));
+            // Validation
+            HashMap<String, Object> fieldsMap = new HashMap();
+            Class<?> clazz = RoomRequest.class;
+            List<String> bypassList = Arrays.asList();
+            for (Field field : clazz.getDeclaredFields()) {
+                field.setAccessible(true);
+                if (!bypassList.contains(field.getName())) {
+                    fieldsMap.put(field.getName(), field.get(roomRequest));
+                }
+            }
+
+            HashMap<String, Object> validationResponse = this.utilityValidation.validate(fieldsMap);
+            if (!(boolean) validationResponse.get("status")) {
+                response.setMessage(validationResponse.get("message").toString());
+                response.setStatus("error");
+                return response;
+            }
+
+            // Fetch existing room by ID
+//            roomId =
+//            Room existingRoom = roomRepository.findById(roomRequest.getPgId())
+//                    .orElseThrow(() -> new ResourceNotFoundException("Room not found with id: " + roomId));
+            Room existingRoom = roomRepository.findById(roomId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Room not found with id: " + roomId));
+
+
+            // Check if the updated combination already exists (excluding self)
+            Optional<Room> duplicateRoom = roomRepository.findBySharingAndIsAcAndPgId(
+                    roomRequest.getSharing().trim().toLowerCase(),
+                    roomRequest.isAc(),
+                    roomRequest.getPgId()
+            );
+            if (duplicateRoom.isPresent() && !duplicateRoom.get().getId().equals(roomId)) {
+                response.setMessage("Room with the same sharing and AC configuration already exists in this PG.");
+                response.setStatus("error");
+                return response;
+            }
+
+            // Update PG
+            pg = pgRepository.findById(roomRequest.getPgId())
+                    .orElseThrow(() -> new ResourceNotFoundException("PG not found with id: " + roomRequest.getPgId()));
+            existingRoom.setPg(pg);
+
+            // Update other fields
+            existingRoom.setAc(roomRequest.isAc());
+            existingRoom.setPrice(roomRequest.getPrice());
+            existingRoom.setDescription(roomRequest.getDescription());
+            existingRoom.setSharing(roomRequest.getSharing());
+            existingRoom.setImageUrl(roomRequest.getImageUrl());
+
+            // Save
+            Room savedRoom = this.roomRepository.save(existingRoom);
+            response.setResult(savedRoom);
+            response.setMessage("Room updated successfully");
+            response.setStatus("success");
+
+        } catch (Exception e) {
+            response.setMessage(e.getMessage());
+            response.setStatus("error");
+        }
+        return response;
+    }
+
 //
 //    @Override
 //    public APIResponse roomByPg(RoomRequest roomRequest) {

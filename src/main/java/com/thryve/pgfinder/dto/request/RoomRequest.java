@@ -14,5 +14,4 @@ public class RoomRequest {
     private boolean isAc;
     private String description;
     private double price;
-
 }
