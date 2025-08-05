@@ -20,10 +20,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import java.lang.reflect.Field;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -129,23 +126,38 @@ public class PGServiceImpl implements PGService {
 		APIResponse response = new APIResponse();
     	
     	try {
-    		 HashMap<String, Object> fieldsMap = new HashMap();
-    		  Class<?> clazz = PGRequest.class;
-    		  List<String> bypassList = Arrays.asList();
-    		  
-    		  for(Field field : clazz.getDeclaredFields()) {
-                  field.setAccessible(true);
-                  if (!bypassList.contains(field.getName())) {
-                      fieldsMap.put(field.getName(), field.get(pgRequest));
-                  }
-              }
-    		  
-    		  HashMap<String, Object> validationResponse = this.utilityValidation.validate(fieldsMap);
-              if ((Boolean)validationResponse.get("status")) {
-                  response.setMessage(validationResponse.get("message").toString());
-                  response.setStatus("error");
-                  return response;
-              }
+//    		 HashMap<String, Object> fieldsMap = new HashMap();
+//    		  Class<?> clazz = PGRequest.class;
+//    		  List<String> bypassList = Arrays.asList();
+//
+//    		  for(Field field : clazz.getDeclaredFields()) {
+//                  field.setAccessible(true);
+//                  if (!bypassList.contains(field.getName())) {
+//                      fieldsMap.put(field.getName(), field.get(pgRequest));
+//                  }
+//              }
+//
+//    		  HashMap<String, Object> validationResponse = this.utilityValidation.validate(fieldsMap);
+//              if ((Boolean)validationResponse.get("status")) {
+//                  response.setMessage(validationResponse.get("message").toString());
+//                  response.setStatus("error");
+//                  return response;
+//              }
+            Map<String, Object> fieldsMap = new HashMap<>();
+            for (Field field : PGRequest.class.getDeclaredFields()) {
+                field.setAccessible(true);
+                fieldsMap.put(field.getName(), field.get(pgRequest));
+            }
+
+            Map<String, Object> validationResponse = this.utilityValidation.validate(fieldsMap);
+            if (!(Boolean.TRUE.equals(validationResponse.get("status")))) {
+                String validationMessage = validationResponse.get("message") != null
+                        ? validationResponse.get("message").toString()
+                        : "Validation failed";
+                response.setMessage(validationMessage);
+                response.setStatus("error");
+                return response;
+            }
             String name = pgRequest.getName().trim().toLowerCase();
             String address = pgRequest.getAddress().trim().toLowerCase();
 
@@ -199,20 +211,35 @@ public class PGServiceImpl implements PGService {
     public APIResponse updatePG(String pgId, PGRequest pgRequest){
         APIResponse response = new APIResponse();
         try {
-            HashMap<String, Object> fieldsMap = new HashMap();
-            Class<?> clazz = PGRequest.class;
-            List<String> bypassList = Arrays.asList();
-
-            for(Field field : clazz.getDeclaredFields()) {
+//            HashMap<String, Object> fieldsMap = new HashMap();
+//            Class<?> clazz = PGRequest.class;
+//            List<String> bypassList = Arrays.asList();
+//
+//            for(Field field : clazz.getDeclaredFields()) {
+//                field.setAccessible(true);
+//                if (!bypassList.contains(field.getName())) {
+//                    fieldsMap.put(field.getName(), field.get(pgRequest));
+//                }
+//            }
+//
+//            HashMap<String, Object> validationResponse = this.utilityValidation.validate(fieldsMap);
+//            if ((Boolean)validationResponse.get("status")) {
+//                response.setMessage(validationResponse.get("message").toString());
+//                response.setStatus("error");
+//                return response;
+//            }
+            Map<String, Object> fieldsMap = new HashMap<>();
+            for (Field field : PGRequest.class.getDeclaredFields()) {
                 field.setAccessible(true);
-                if (!bypassList.contains(field.getName())) {
-                    fieldsMap.put(field.getName(), field.get(pgRequest));
-                }
+                fieldsMap.put(field.getName(), field.get(pgRequest));
             }
 
-            HashMap<String, Object> validationResponse = this.utilityValidation.validate(fieldsMap);
-            if ((Boolean)validationResponse.get("status")) {
-                response.setMessage(validationResponse.get("message").toString());
+            Map<String, Object> validationResponse = this.utilityValidation.validate(fieldsMap);
+            if (!(Boolean.TRUE.equals(validationResponse.get("status")))) {
+                String validationMessage = validationResponse.get("message") != null
+                        ? validationResponse.get("message").toString()
+                        : "Validation failed";
+                response.setMessage(validationMessage);
                 response.setStatus("error");
                 return response;
             }

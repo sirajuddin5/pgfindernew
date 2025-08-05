@@ -1,6 +1,7 @@
 package com.thryve.pgfinder.service.Impl;
 
 import com.thryve.pgfinder.config.validation.UtilityValidation;
+import com.thryve.pgfinder.dto.request.PGRequest;
 import com.thryve.pgfinder.dto.request.RoomRequest;
 import com.thryve.pgfinder.exception.ResourceNotFoundException;
 import com.thryve.pgfinder.model.PG;
@@ -46,18 +47,18 @@ public class RoomServiceImpl implements RoomService {
             PG pg = pgRepository.findById(roomRequest.getPgId())
                     .orElseThrow(() -> new RuntimeException("PG not found"));
 
-            HashMap<String, Object> fieldsMap = new HashMap();
-            Class<?> clazz = RoomRequest.class;
-            List<String> bypassList = Arrays.asList();
-
-            for(Field field : clazz.getDeclaredFields()) {
+            Map<String, Object> fieldsMap = new HashMap<>();
+            for (Field field : RoomRequest.class.getDeclaredFields()) {
                 field.setAccessible(true);
                 fieldsMap.put(field.getName(), field.get(roomRequest));
             }
 
-            HashMap<String, Object> validationResponse = this.utilityValidation.validate(fieldsMap);
-            if ((Boolean)validationResponse.get("status")) {
-                response.setMessage(validationResponse.get("message").toString());
+            Map<String, Object> validationResponse = this.utilityValidation.validate(fieldsMap);
+            if (!(Boolean.TRUE.equals(validationResponse.get("status")))) {
+                String validationMessage = validationResponse.get("message") != null
+                        ? validationResponse.get("message").toString()
+                        : "Validation failed";
+                response.setMessage(validationMessage);
                 response.setStatus("error");
                 return response;
             }
@@ -99,35 +100,32 @@ public class RoomServiceImpl implements RoomService {
     public APIResponse updateRoom(String roomId, RoomRequest roomRequest) {
         APIResponse response = new APIResponse();
         try {
+            // Validate PG existence
             PG pg = pgRepository.findById(roomRequest.getPgId())
-                    .orElseThrow(() -> new RuntimeException("PG not found"));
-            // Validation
-            HashMap<String, Object> fieldsMap = new HashMap();
-            Class<?> clazz = RoomRequest.class;
-            List<String> bypassList = Arrays.asList();
-            for (Field field : clazz.getDeclaredFields()) {
+                    .orElseThrow(() -> new ResourceNotFoundException("PG not found with id: " + roomRequest.getPgId()));
+
+            // Reflective Validation
+            Map<String, Object> fieldsMap = new HashMap<>();
+            for (Field field : RoomRequest.class.getDeclaredFields()) {
                 field.setAccessible(true);
-                if (!bypassList.contains(field.getName())) {
-                    fieldsMap.put(field.getName(), field.get(roomRequest));
-                }
+                fieldsMap.put(field.getName(), field.get(roomRequest));
             }
 
-            HashMap<String, Object> validationResponse = this.utilityValidation.validate(fieldsMap);
-            if (!(boolean) validationResponse.get("status")) {
-                response.setMessage(validationResponse.get("message").toString());
+            Map<String, Object> validationResponse = this.utilityValidation.validate(fieldsMap);
+            if (!(Boolean.TRUE.equals(validationResponse.get("status")))) {
+                String validationMessage = validationResponse.get("message") != null
+                        ? validationResponse.get("message").toString()
+                        : "Validation failed";
+                response.setMessage(validationMessage);
                 response.setStatus("error");
                 return response;
             }
 
             // Fetch existing room by ID
-//            roomId =
-//            Room existingRoom = roomRepository.findById(roomRequest.getPgId())
-//                    .orElseThrow(() -> new ResourceNotFoundException("Room not found with id: " + roomId));
             Room existingRoom = roomRepository.findById(roomId)
                     .orElseThrow(() -> new ResourceNotFoundException("Room not found with id: " + roomId));
 
-
-            // Check if the updated combination already exists (excluding self)
+            // Check for duplicate room with same config
             Optional<Room> duplicateRoom = roomRepository.findBySharingAndIsAcAndPgId(
                     roomRequest.getSharing().trim().toLowerCase(),
                     roomRequest.isAc(),
@@ -139,30 +137,29 @@ public class RoomServiceImpl implements RoomService {
                 return response;
             }
 
-            // Update PG
-            pg = pgRepository.findById(roomRequest.getPgId())
-                    .orElseThrow(() -> new ResourceNotFoundException("PG not found with id: " + roomRequest.getPgId()));
+            // Update fields
             existingRoom.setPg(pg);
-
-            // Update other fields
             existingRoom.setAc(roomRequest.isAc());
             existingRoom.setPrice(roomRequest.getPrice());
             existingRoom.setDescription(roomRequest.getDescription());
             existingRoom.setSharing(roomRequest.getSharing());
             existingRoom.setImageUrl(roomRequest.getImageUrl());
 
-            // Save
+            // Save updated room
             Room savedRoom = this.roomRepository.save(existingRoom);
             response.setResult(savedRoom);
             response.setMessage("Room updated successfully");
             response.setStatus("success");
 
         } catch (Exception e) {
-            response.setMessage(e.getMessage());
+            response.setMessage("Error: " + e.getMessage());
             response.setStatus("error");
         }
+
         return response;
     }
+
+
 
 //
 //    @Override

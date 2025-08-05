@@ -20,6 +20,6 @@ public class RoomController {
     }
     @PutMapping("/update-room/{roomId}")
     public ResponseEntity<?> upadteRoom(@PathVariable String roomId, @RequestBody RoomRequest dto){
-        return ResponseEntity.ok(this.roomService.updateRoom(roomId, dto));
+        return ResponseEntity.ok(roomService.updateRoom(roomId, dto));
     }
 }
