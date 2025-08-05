@@ -1,7 +1,6 @@
 package com.thryve.pgfinder.service.Impl;
 
 import com.thryve.pgfinder.config.validation.UtilityValidation;
-import com.thryve.pgfinder.dto.request.PGRequest;
 import com.thryve.pgfinder.dto.request.RoomRequest;
 import com.thryve.pgfinder.exception.ResourceNotFoundException;
 import com.thryve.pgfinder.model.PG;
@@ -10,12 +9,15 @@ import com.thryve.pgfinder.model.common.APIResponse;
 import com.thryve.pgfinder.model.common.DeleteRequest;
 import com.thryve.pgfinder.model.common.FetchAPIRequest;
 import com.thryve.pgfinder.model.common.filter.specification.FiltersSpecification;
+import com.thryve.pgfinder.model.common.page.PageRequestDTO;
 import com.thryve.pgfinder.repository.PGRepository;
 import com.thryve.pgfinder.repository.RoomRepository;
 import com.thryve.pgfinder.service.RoomService;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
@@ -167,13 +169,47 @@ public class RoomServiceImpl implements RoomService {
 //        return null;
 //    }
 
-//    @Override
+    @Override
 //    public APIResponse getAllRooms(FetchAPIRequest fetchAPIRequest) {
-//        return null;
+//        APIResponse response = new APIResponse();
+//        try{
+//            Specification<Room> searchSpecification = this.roomFiltersSpecification.getSearchSpecification(fetchAPIRequest.getFilterList(), fetchAPIRequest.getGlobalOperator());
+//            Pageable pageable = (new PageRequestDTO()).getPageable(fetchAPIRequest.getPageRequestDTO());
+//            Page<Room> cameraDetailsPage = this.roomRepository.findAll(searchSpecification, pageable);
+//            response.setResult(cameraDetailsPage);
+//            response.setMessage("room's Details Fetched Successfully.");
+//            response.setStatus("success");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            response.setMessage(e.getMessage());
+//            response.setStatus("error");
+//        }
+//        return response;
 //    }
+    public APIResponse getAllRooms(FetchAPIRequest fetchAPIRequest) {
+        APIResponse response = new APIResponse();
+
+        try {
+            Specification<Room> searchSpecification = this.roomFiltersSpecification.getSearchSpecification(fetchAPIRequest.getFilterList(), fetchAPIRequest.getGlobalOperator());
+            Pageable pageable = (new PageRequestDTO()).getPageable(fetchAPIRequest.getPageRequestDTO());
+            Page<Room> cameraDetailsPage = this.roomRepository.findAll(searchSpecification, pageable);
+            response.setResult(cameraDetailsPage);
+            response.setMessage("pg's Details Fetched Successfully.");
+            response.setStatus("success");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setMessage(e.getMessage());
+            response.setStatus("error");
+        }
+
+
+        return response;
+    }
 //
-//    @Override
-//    public DeleteRequest deleteRoom(String roomId) {
-//        return null;
-//    }
+    @Override
+    public DeleteRequest deleteRoom(String roomId) {
+        roomRepository.deleteById(roomId);
+        return new DeleteRequest(roomId);
+    }
 }

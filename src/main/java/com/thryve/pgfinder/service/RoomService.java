@@ -9,6 +9,6 @@ public interface RoomService {
     APIResponse createRoom(RoomRequest roomRequest);
     APIResponse updateRoom( String roomId, RoomRequest roomRequest);
 //    APIResponse roomByPg(RoomRequest roomRequest);
-//    APIResponse getAllRooms(FetchAPIRequest fetchAPIRequest);
-//    DeleteRequest deleteRoom(String roomId);
+    APIResponse getAllRooms(FetchAPIRequest fetchAPIRequest);
+    DeleteRequest deleteRoom(String roomId);
 }
