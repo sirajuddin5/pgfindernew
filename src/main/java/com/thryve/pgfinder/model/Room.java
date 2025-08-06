@@ -1,5 +1,6 @@
 package com.thryve.pgfinder.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,7 +25,7 @@ public class Room {
 //    private String pgId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pg_id")
-
+@JsonIgnore
 //    @JoinColumn(name = "pgId", referencedColumnName = "id", insertable = false, updatable = false)
     private PG pg;
 

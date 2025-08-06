@@ -186,6 +186,7 @@ public class RoomServiceImpl implements RoomService {
 //        }
 //        return response;
 //    }
+
     public APIResponse getAllRooms(FetchAPIRequest fetchAPIRequest) {
         APIResponse response = new APIResponse();
 
