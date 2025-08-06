@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface RoomRepository extends JpaRepository<Room, String>, JpaSpecificationExecutor<Room> {
@@ -16,4 +17,6 @@ public interface RoomRepository extends JpaRepository<Room, String>, JpaSpecific
             @Param("isAc") boolean isAc,
             @Param("pgId") String pgId
     );
+    List<Room> findByPgId(String pgId);
+
 }

@@ -1,6 +1,7 @@
 package com.thryve.pgfinder.controller;
 
 import com.thryve.pgfinder.dto.request.RoomRequest;
+import com.thryve.pgfinder.model.common.APIResponse;
 import com.thryve.pgfinder.model.common.DeleteRequest;
 import com.thryve.pgfinder.model.common.FetchAPIRequest;
 import com.thryve.pgfinder.service.RoomService;
@@ -33,4 +34,12 @@ public class RoomController {
         DeleteRequest delete = roomService.deleteRoom(roomId);
         return ResponseEntity.ok(delete);
     }
+    @PostMapping("/rooms/{pgId}")
+    public ResponseEntity<APIResponse> getRoomsByPg(
+            @PathVariable String pgId,
+            @RequestBody FetchAPIRequest fetchAPIRequest) {
+        return ResponseEntity.ok(this.roomService.roomByPg(pgId, fetchAPIRequest));
+    }
+
+
 }

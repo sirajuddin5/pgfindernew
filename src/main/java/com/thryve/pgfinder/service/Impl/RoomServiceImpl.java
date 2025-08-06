@@ -16,6 +16,7 @@ import com.thryve.pgfinder.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -212,5 +213,32 @@ public class RoomServiceImpl implements RoomService {
     public DeleteRequest deleteRoom(String roomId) {
         roomRepository.deleteById(roomId);
         return new DeleteRequest(roomId);
+    }
+
+    @Override
+    public APIResponse roomByPg(String pgId, FetchAPIRequest fetchAPIRequest){
+        APIResponse response = new APIResponse();
+        try{
+//        List<Room> rooms = this.roomRepository.findByPgId(pgId);
+//        response.setResult(rooms);
+//        response.setMessage("Rooms fetched successfully for PG ID: " + pgId);
+//        response.setStatus("success");
+        Specification<Room> searchSpecification = this.roomFiltersSpecification
+                .getSearchSpecification(fetchAPIRequest.getFilterList(), fetchAPIRequest.getGlobalOperator());
+        Specification<Room> pgIdSpec = (root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("pg").get("id"), pgId);        Specification<Room> finalSpec = (searchSpecification == null)
+                ? pgIdSpec
+                :searchSpecification.and(pgIdSpec);
+        Pageable pageable = new PageRequestDTO().getPageable(fetchAPIRequest.getPageRequestDTO());
+        Page<Room> roomPage = roomRepository.findAll(finalSpec, pageable);
+        response.setResult(roomPage);
+        response.setMessage("Rooms fetched successfully for PG ID: " + pgId);
+        response.setStatus("success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setStatus("error");
+            response.setMessage("Failed to fetching rooms: " + e.getMessage());
+        }
+        return response;
     }
 }
