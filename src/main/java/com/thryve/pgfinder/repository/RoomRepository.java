@@ -8,15 +8,18 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-public interface RoomRepository extends JpaRepository<Room, String>, JpaSpecificationExecutor<Room> {
+public interface RoomRepository extends JpaRepository<Room, UUID>, JpaSpecificationExecutor<Room> {
 
-    @Query("SELECT r FROM Room r WHERE LOWER(TRIM(r.sharing)) = LOWER(TRIM(:sharing)) AND r.isAc = :isAc AND r.pg.id = :pgId")
-    Optional<Room> findBySharingAndIsAcAndPgId(
-            @Param("sharing") String sharing,
-            @Param("isAc") boolean isAc,
-            @Param("pgId") String pgId
-    );
-    List<Room> findByPgId(String pgId);
+//    @Query("SELECT r FROM Room r WHERE LOWER(TRIM(r.sharing)) = LOWER(TRIM(:sharing)) AND r.isAc = :isAc AND r.pg.id = :pgId")
+//    Optional<Room> findBySharingAndIsAcAndPgId(
+//            @Param("sharing") String sharing,
+//            @Param("isAc") boolean isAc,
+//            @Param("pgId") UUID pgId
+//    );
+    List<Room> findByPgId(UUID pgId);
+    
+    List<Room> findByPgIdAndAuditDeletedFalse(UUID pgId);
 
 }
