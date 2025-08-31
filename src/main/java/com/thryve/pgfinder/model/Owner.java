@@ -36,6 +36,10 @@ public class Owner extends BaseEntity {
     @Column(name = "email", length = 150, unique = true)
     @Email
     private String email;
+    
+    @Column(name = "username", length = 150, unique = true)
+    @NotBlank(message = "Username must not be blank")
+    private String username;
 
     @Column(name = "phone", length = 30)
     private String phone;

@@ -32,6 +32,7 @@ package com.thryve.pgfinder.mapper;
 import java.util.List;
 
 import org.mapstruct.BeanMapping;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -55,9 +56,7 @@ public interface PGMapper{
 	    PgSummaryResponse toSummary(PG pg);
 	  
 	    // Pg -> Detail DTO
-	    @Mapping(source = "audit.createdAt", target = "createdAt")
-	    @Mapping(source = "audit.updatedAt", target = "updatedAt")
-	    PgDetailResponse toDetail(PG pg);
+PgDetailResponse toDetail(PG pg);
 	    
 	    // Create request -> entity (note: owner / address / other relations should be set in service)
 	    PG toEntity(CreatePgRequest request);
@@ -78,4 +77,12 @@ public interface PGMapper{
 	    List<PgSummaryResponse> toSummaries(List<PG> pgs);
 
 	
+
+    @AfterMapping
+    default void fillAuditTimes(PG source, @MappingTarget PgDetailResponse target) {
+        if (source != null && source.getAudit() != null) {
+            target.setCreatedAt(source.getAudit().getCreatedAt());
+            target.setUpdatedAt(source.getAudit().getUpdatedAt());
+        }
+    }
 }
