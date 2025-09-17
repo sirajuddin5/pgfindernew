@@ -56,7 +56,7 @@ public interface PGMapper{
 	    PgSummaryResponse toSummary(PG pg);
 	  
 	    // Pg -> Detail DTO
-PgDetailResponse toDetail(PG pg);
+	    PgDetailResponse toDetail(PG pg);
 	    
 	    // Create request -> entity (note: owner / address / other relations should be set in service)
 	    PG toEntity(CreatePgRequest request);

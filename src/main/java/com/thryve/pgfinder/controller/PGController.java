@@ -31,7 +31,9 @@ public class PGController {
     private final PGService pgService;
 
     @PostMapping("/create-pg")
-    public  ResponseEntity<?>  create(@RequestBody CreatePgRequest dto){
+    public  ResponseEntity<?>  create(@Valid @RequestBody CreatePgRequest dto){
+    	
+    	System.out.println("dto from controller :"+dto.getName());
         return ResponseEntity.ok(this.pgService.createPg(dto));
     }
     

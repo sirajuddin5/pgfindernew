@@ -4,7 +4,13 @@ import com.thryve.pgfinder.config.validation.UtilityValidation;
 import com.thryve.pgfinder.dto.request.CreatePgRequest;
 import com.thryve.pgfinder.dto.request.CreateRoomRequest;
 import com.thryve.pgfinder.dto.request.PGRequest;
+import com.thryve.pgfinder.dto.request.PgSummaryResponse;
 import com.thryve.pgfinder.dto.request.UpdatePgRequest;
+import com.thryve.pgfinder.dto.response.ImageResponse;
+import com.thryve.pgfinder.dto.response.OwnerDto;
+import com.thryve.pgfinder.dto.response.PgDetailResponse;
+import com.thryve.pgfinder.dto.response.ReviewResponse;
+import com.thryve.pgfinder.dto.response.RoomResponse;
 import com.thryve.pgfinder.exception.ResourceNotFoundException;
 import com.thryve.pgfinder.mapper.PGMapper;
 import com.thryve.pgfinder.model.Owner;
@@ -16,6 +22,9 @@ import com.thryve.pgfinder.model.common.DeleteRequest;
 import com.thryve.pgfinder.model.common.FetchAPIRequest;
 import com.thryve.pgfinder.model.common.filter.specification.FiltersSpecification;
 import com.thryve.pgfinder.model.common.page.PageRequestDTO;
+import com.thryve.pgfinder.model.enums.AmenityType;
+import com.thryve.pgfinder.model.enums.AvailabilityStatus;
+import com.thryve.pgfinder.model.enums.RoomType;
 import com.thryve.pgfinder.repository.OwnerRepository;
 import com.thryve.pgfinder.repository.PGRepository;
 import com.thryve.pgfinder.repository.RoomRepository;
@@ -57,10 +66,219 @@ public class PGServiceImpl implements PGService {
     private final RoomRepository roomRepository;
     private final PGMapper pgMapper;
     
+//    @Override
+//    @Transactional
+//    public APIResponse createPg(CreatePgRequest request) {
+//        APIResponse responseComp = new APIResponse();
+//        
+//        System.out.println(" name in service impl :"+request.getName());
+//
+//        // Validation
+//        Map<String, Object> fieldsMap = new HashMap<>();
+//        for (Field field : CreatePgRequest.class.getDeclaredFields()) {
+//            field.setAccessible(true);
+//            try {
+//                fieldsMap.put(field.getName(), field.get(request));
+//            } catch (IllegalAccessException e) {
+//                // Handle reflection exception
+//                responseComp.setMessage("Failed to access request fields");
+//                responseComp.setStatus("error");
+//                return responseComp;
+//            }
+//        }
+//
+//        Map<String, Object> validationResponse = utilityValidation.validate(fieldsMap);
+//        if (!(Boolean.TRUE.equals(validationResponse.get("status")))) {
+//            String validationMessage = validationResponse.get("message") != null
+//                    ? validationResponse.get("message").toString()
+//                    : "Validation failed";
+//            responseComp.setMessage(validationMessage);
+//            responseComp.setStatus("error");
+//            return responseComp;
+//        }
+//
+//        // Check for existing PG
+////        String name = request.getName().trim().toLowerCase();
+////        // TODO: update this to actual address from request
+////        String address = "test"; 
+////        Optional<PG> existingPg = pgRepository.findByNameAndAddress(name, address);
+////        if (existingPg.isPresent()) {
+////            response.setMessage("This PG is already listed with the same name and address.");
+////            response.setStatus("error");
+////            return response;
+////        }
+//
+//        // Resolve owner
+//        Owner owner = resolveOwner(request.getOwnerId());
+//
+//        // Map request to entity
+////        PG pg = pgMapper.toEntity(request);
+////        System.out.println("after mapping :"+pg.getName());
+//        
+//        PG pg = new PG();
+//        pg.setName(request.getName());
+//        pg.setShortDescription(request.getShortDescription());
+//        pg.setDescription(request.getDescription());
+//        pg.setPgType(request.getPgType());
+//        pg.setGenderPreference(request.getGenderPreference());
+//        pg.setAddress(request.getAddress());
+//        pg.setGeoLocation(request.getGeoLocation());
+//        pg.setOwner(owner);
+//        pg.setBasePrice(request.getBasePrice());
+//        pg.setAmenities(request.getAmenities() != null ? request.getAmenities() : new HashSet<>());
+//        pg.setContactEmail(request.getContactEmail());
+//        pg.setContactPhone(request.getContactPhone());
+//        pg.setTags(request.getTags() != null ? request.getTags() : new HashSet<>());
+//
+//        // Initialize optional fields with defaults (already handled in entity constructor, but safer here)
+//        pg.setAvailabilityStatus(AvailabilityStatus.AVAILABLE);
+//        pg.setVerified(false);
+//        pg.setFeatured(false);
+//        pg.setAudit(new AuditModel());
+//
+//        // Map rooms if provided
+//        if (request.getRooms() != null && !request.getRooms().isEmpty()) {
+//            for (CreateRoomRequest roomRequest : request.getRooms()) {
+//                Room room = new Room();
+//                room.setTitle(roomRequest.getTitle());
+//                room.setRoomType(roomRequest.getRoomType());
+//                room.setCapacity(roomRequest.getCapacity());
+//               room.setPrice(roomRequest.getPrice());
+//                room.setAvailableUnits(roomRequest.getAvailableUnits());
+//                room.setDescription(roomRequest.getDescription());
+//                room.setAmenities(roomRequest.getAmenities() != null ? roomRequest.getAmenities() : Set.of());
+//
+//                room.setPg(pg); // Set the owning side of the relationship
+//
+//                pg.getRooms().add(room);
+//            }
+//        }
+//
+//
+//        // Optionally print
+//        System.out.println("after mapping: " + pg.getName());
+//
+//		System.out.println("=== STEP 1: After Mapper ===");
+//		System.out.println("Audit object: " + pg.getAudit());
+//		if (pg.getAudit() != null) {
+//		    System.out.println("Audit.deleted = " + pg.getAudit().isDeleted());
+//		} else {
+//		    System.out.println("Audit is NULL!");
+//		}
+//        pg.setOwner(owner);
+//
+//       
+//        if (pg.getAudit() == null) pg.setAudit(new AuditModel());
+//       
+//        pg.getAudit().setCreatedAt(OffsetDateTime.now());
+//        pg.getAudit().setDeleted(false);
+//
+//        // Save rooms if present
+//        if (request.getRooms() != null) {
+//            request.getRooms().forEach(cr -> {
+//                Room room = pgMapper.toRoom(cr);
+//                room.setPg(pg);
+//                
+//                if (room.getAudit() == null) {
+//                    room.setAudit(new AuditModel());
+//                }
+//                room.getAudit().setCreatedAt(OffsetDateTime.now());
+//                room.getAudit().setDeleted(false);
+//                
+//                System.out.println("=== Room Audit Set ===");
+//                System.out.println("Room audit: " + room.getAudit());
+//                System.out.println("Room deleted: " + room.getAudit().isDeleted());
+//                
+//                
+//                pg.getRooms().add(room);
+//            });
+//        }
+//
+//        System.out.println("=== STEP 2: Before Repository Save ===");
+//        System.out.println("Audit object: " + pg.getAudit());
+//        if (pg.getAudit() != null) {
+//            System.out.println("Audit.deleted = " + pg.getAudit().isDeleted());
+//        } else {
+//            System.out.println("Audit is NULL!");
+//        }
+//        // Save PG entity (transactional)
+//        PG saved = pgRepository.save(pg);
+//        
+//        
+//        
+//        PgDetailResponse response = new PgDetailResponse();
+//
+//        response.setId(pg.getId());
+//        response.setName(pg.getName());
+//        response.setShortDescription(pg.getShortDescription());
+//        response.setDescription(pg.getDescription());
+//        response.setPgType(pg.getPgType());
+//        response.setAddress(pg.getAddress());
+//        response.setGeoLocation(pg.getGeoLocation());
+//        response.setContactPhone(pg.getContactPhone());
+//        response.setContactEmail(pg.getContactEmail());
+//        response.setAmenities(pg.getAmenities());
+//        response.setBasePrice(pg.getBasePrice());
+//        response.setAvailabilityStatus(pg.getAvailabilityStatus());
+//        response.setVerified(pg.isVerified());
+//        response.setFeatured(pg.isFeatured());
+//        response.setMaxOccupancy(pg.getMaxOccupancy());
+//        response.setTags(pg.getTags() != null ? pg.getTags().stream().toList() : List.of());
+//       
+//
+//              		
+//        // ===== Map Rooms to RoomResponse =====
+////        List<RoomResponse> roomResponses = pg.getRooms().stream().map(room -> {
+////            return RoomResponse.builder()
+////                .id(room.getId())
+////                .title(room.getTitle())
+////                .roomType(room.getRoomType())
+////                .capacity(room.getCapacity())
+////                .price(room.getMonthlyRent()) // Assuming this is the correct field
+////                .availableUnits(room.getAvailableUnits())
+////                .description(room.getDescription())
+////                .amenities(room.getAmenities())
+////               
+////                .build();
+////        }).toList();
+//        response.setRooms(roomResponses);
+//
+//        // ===== Map Images to ImageResponse =====
+//        List<ImageResponse> imageResponses = pg.getImages().stream().map(img -> {
+//            return ImageResponse.builder()
+//                .id(img.getId())
+//                .url(img.getUrl())
+//                .caption(img.getCaption())
+//                .build();
+//        }).toList();
+//        response.setImages(imageResponses);
+//
+//        // ===== Map Reviews to ReviewResponse =====
+//        List<ReviewResponse> reviewResponses = pg.getReviews().stream().map(review -> {
+//            return ReviewResponse.builder()
+//                .id(review.getId())
+//                .rating(review.getRating())
+//                .comment(review.getComment())
+//                .createdAt(review.getCreatedAt())
+//                .reviewerName(review.getReviewer().getName()) // assuming you have this
+//                .build();
+//        }).toList();
+//        response.setReviews(reviewResponses);
+//
+//
+//        responseComp.setResult(pgMapper.toDetail(saved));
+//        responseComp.setMessage("PG created successfully");
+//        responseComp.setStatus("success");
+//
+//        return responseComp;
+//    }
+
     @Override
     @Transactional
     public APIResponse createPg(CreatePgRequest request) {
-        APIResponse response = new APIResponse();
+        APIResponse responseComp = new APIResponse();
+
+        System.out.println(" name in service impl :" + request.getName());
 
         // Validation
         Map<String, Object> fieldsMap = new HashMap<>();
@@ -69,10 +287,9 @@ public class PGServiceImpl implements PGService {
             try {
                 fieldsMap.put(field.getName(), field.get(request));
             } catch (IllegalAccessException e) {
-                // Handle reflection exception
-                response.setMessage("Failed to access request fields");
-                response.setStatus("error");
-                return response;
+                responseComp.setMessage("Failed to access request fields");
+                responseComp.setStatus("error");
+                return responseComp;
             }
         }
 
@@ -81,79 +298,125 @@ public class PGServiceImpl implements PGService {
             String validationMessage = validationResponse.get("message") != null
                     ? validationResponse.get("message").toString()
                     : "Validation failed";
-            response.setMessage(validationMessage);
-            response.setStatus("error");
-            return response;
+            responseComp.setMessage(validationMessage);
+            responseComp.setStatus("error");
+            return responseComp;
         }
-
-        // Check for existing PG
-//        String name = request.getName().trim().toLowerCase();
-//        // TODO: update this to actual address from request
-//        String address = "test"; 
-//        Optional<PG> existingPg = pgRepository.findByNameAndAddress(name, address);
-//        if (existingPg.isPresent()) {
-//            response.setMessage("This PG is already listed with the same name and address.");
-//            response.setStatus("error");
-//            return response;
-//        }
 
         // Resolve owner
         Owner owner = resolveOwner(request.getOwnerId());
 
-        // Map request to entity
-        PG pg = pgMapper.toEntity(request);
-
-		System.out.println("=== STEP 1: After Mapper ===");
-		System.out.println("Audit object: " + pg.getAudit());
-		if (pg.getAudit() != null) {
-		    System.out.println("Audit.deleted = " + pg.getAudit().isDeleted());
-		} else {
-		    System.out.println("Audit is NULL!");
-		}
+        // Map request to entity manually
+        PG pg = new PG();
+        pg.setName(request.getName());
+        pg.setShortDescription(request.getShortDescription());
+        pg.setDescription(request.getDescription());
+        pg.setPgType(request.getPgType());
+        pg.setGenderPreference(request.getGenderPreference());
+        pg.setAddress(request.getAddress());
+        pg.setGeoLocation(request.getGeoLocation());
         pg.setOwner(owner);
+        pg.setBasePrice(request.getBasePrice());
+        pg.setAmenities(request.getAmenities() != null ? request.getAmenities() : new HashSet<>());
+        pg.setContactEmail(request.getContactEmail());
+        pg.setContactPhone(request.getContactPhone());
+        pg.setTags(request.getTags() != null ? request.getTags() : new HashSet<>());
 
-       
+        pg.setAvailabilityStatus(AvailabilityStatus.AVAILABLE);
+        pg.setVerified(false);
+        pg.setFeatured(false);
+
+        // Initialize audit if null
         if (pg.getAudit() == null) pg.setAudit(new AuditModel());
-       
         pg.getAudit().setCreatedAt(OffsetDateTime.now());
         pg.getAudit().setDeleted(false);
+        
+        System.out.println("Owner UserNAme" + owner.getUsername()); 
+        pg.setOwner(owner);
 
-        // Save rooms if present
-        if (request.getRooms() != null) {
-            request.getRooms().forEach(cr -> {
-                Room room = pgMapper.toRoom(cr);
+        // Map rooms if provided
+        if (request.getRooms() != null && !request.getRooms().isEmpty()) {
+            for (CreateRoomRequest roomRequest : request.getRooms()) {
+                Room room = new Room();
+                room.setTitle(roomRequest.getTitle());
+                room.setRoomType(roomRequest.getRoomType());
+                room.setCapacity(roomRequest.getCapacity());
+                room.setPrice(roomRequest.getPrice());
+                room.setAvailableUnits(roomRequest.getAvailableUnits());
+                room.setDescription(roomRequest.getDescription());
+                room.setAmenities(roomRequest.getAmenities() != null ? roomRequest.getAmenities() : Set.of());
                 room.setPg(pg);
-                
-                if (room.getAudit() == null) {
-                    room.setAudit(new AuditModel());
-                }
+
+                if (room.getAudit() == null) room.setAudit(new AuditModel());
                 room.getAudit().setCreatedAt(OffsetDateTime.now());
                 room.getAudit().setDeleted(false);
-                
-                System.out.println("=== Room Audit Set ===");
-                System.out.println("Room audit: " + room.getAudit());
-                System.out.println("Room deleted: " + room.getAudit().isDeleted());
-                
-                
+
                 pg.getRooms().add(room);
-            });
+            }
         }
 
-        System.out.println("=== STEP 2: Before Repository Save ===");
-        System.out.println("Audit object: " + pg.getAudit());
-        if (pg.getAudit() != null) {
-            System.out.println("Audit.deleted = " + pg.getAudit().isDeleted());
-        } else {
-            System.out.println("Audit is NULL!");
-        }
-        // Save PG entity (transactional)
+        System.out.println("after mapping: " + pg.getName());
+
+        // Save PG entity
         PG saved = pgRepository.save(pg);
 
-        response.setResult(pgMapper.toDetail(saved));
-        response.setMessage("PG created successfully");
-        response.setStatus("success");
+        // Prepare response manually
+        PgDetailResponse response = new PgDetailResponse();
+        response.setId(saved.getId());
+        response.setName(saved.getName());
+        response.setShortDescription(saved.getShortDescription());
+        response.setDescription(saved.getDescription());
+        response.setPgType(saved.getPgType());
+        response.setAddress(saved.getAddress());
+        response.setGeoLocation(saved.getGeoLocation());
+        response.setContactPhone(saved.getContactPhone());
+        response.setContactEmail(saved.getContactEmail());
+        response.setAmenities(saved.getAmenities());
+        response.setBasePrice(saved.getBasePrice());
+        response.setAvailabilityStatus(saved.getAvailabilityStatus());
+        response.setVerified(saved.isVerified());
+        response.setFeatured(saved.isFeatured());
+        response.setMaxOccupancy(saved.getMaxOccupancy());
+        response.setTags(saved.getTags() != null ? saved.getTags().stream().toList() : List.of());
 
-        return response;
+        // Map rooms to RoomResponse manually
+        List<RoomResponse> roomResponses = saved.getRooms() == null ? List.of() : saved.getRooms().stream()
+                .map(room -> RoomResponse.builder()
+                        .id(room.getId())
+                        .title(room.getTitle())
+                        .roomType(room.getRoomType())
+                        .capacity(room.getCapacity())
+                        .price(room.getPrice())
+                        .availableUnits(room.getAvailableUnits())
+                        .description(room.getDescription())
+                        .amenities(room.getAmenities())
+                        .currentBookings(0) // Set as per your logic
+                        .build())
+                .toList();
+        response.setRooms(roomResponses);
+
+        // Map images to ImageResponse manually
+        List<ImageResponse> imageResponses = saved.getImages() == null ? List.of() : saved.getImages().stream()
+                .map(img -> ImageResponse.builder()
+                        .id(img.getId())
+                        .url(img.getUrl())
+                        .description(img.getDescription())
+                        .sortOrder(img.getSortOrder())
+                        .build())
+                .toList();
+        response.setImages(imageResponses);
+
+        // Map reviews to ReviewResponse manually
+//        TODO : Reviews 
+
+        // TODO: Map owner to OwnerDto if needed here
+        // response.setOwner(ownerMapper.toDto(saved.getOwner()));
+
+        responseComp.setResult(response);
+        responseComp.setMessage("PG created successfully");
+        responseComp.setStatus("success");
+
+        return responseComp;
     }
 
 	
@@ -242,7 +505,12 @@ public class PGServiceImpl implements PGService {
 		    Specification<PG> searchSpecification = this.pgFiltersSpecification.getSearchSpecification(fetchAPIRequest.getFilterList(), fetchAPIRequest.getGlobalOperator());
             Pageable pageable = (new PageRequestDTO()).getPageable(fetchAPIRequest.getPageRequestDTO());
             Page<PG> page = this.pgRepository.findAll(searchSpecification, pageable);
-            response.setResult(page.map(pgMapper::toSummary));
+            
+            Page<PgSummaryResponse> summaryPage = page.map(this::toSummary);
+            
+            response.setResult(summaryPage);
+            
+            
             response.setMessage("pg's Details Fetched Successfully.");
             response.setStatus("success");
 			
@@ -255,6 +523,47 @@ public class PGServiceImpl implements PGService {
 
 	}
 
+	public PgSummaryResponse toSummary(PG pg) {
+	    if (pg == null) {
+	        return null;
+	    }
+
+	    // Get the first image URL if exists
+	    String thumbnailImageUrl = null;
+	    if (pg.getImages() != null && !pg.getImages().isEmpty()) {
+	        thumbnailImageUrl = pg.getImages().get(0).getUrl(); // Assuming PgImage has getUrl()
+	    }
+
+	    // Calculate average rating and review count
+	    double avgRating = 0.0;
+	    int reviewCount = 0;
+	    if (pg.getReviews() != null && !pg.getReviews().isEmpty()) {
+	        reviewCount = pg.getReviews().size();
+	        double totalRating = pg.getReviews().stream()
+	                                .mapToDouble(r -> r.getRating() != null ? r.getRating() : 0)
+	                                .sum();
+	        avgRating = totalRating / reviewCount;
+	    }
+
+	    return PgSummaryResponse.builder()
+	            .id(pg.getId())
+	            .name(pg.getName())
+	            .shortDescription(pg.getShortDescription())
+	            .address(pg.getAddress())
+	            .geoLocation(pg.getGeoLocation())
+	            .basePrice(pg.getBasePrice())
+	            .availabilityStatus(pg.getAvailabilityStatus())
+	            .pgType(pg.getPgType())
+	            .amenities(pg.getAmenities())
+	            .thumbnailImageUrl(thumbnailImageUrl)
+	            .avgRating(avgRating > 0 ? avgRating : null)
+	            .reviewCount(reviewCount)
+	            .verified(pg.isVerified())
+	            .build();
+	}
+
+	
+	
 //	delete Pg
 	@Override
 	@Transactional

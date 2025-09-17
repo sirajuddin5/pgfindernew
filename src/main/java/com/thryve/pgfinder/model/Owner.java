@@ -53,9 +53,10 @@ public class Owner extends BaseEntity {
     private AuditModel audit = new AuditModel();
     
     @Builder
-    public Owner(String fullName, String email, String phone, String authUserId, AuditModel audit) {
+    public Owner(String fullName, String email, String username, String phone, String authUserId, AuditModel audit) {
         this.fullName = fullName;
         this.email = email;
+        this.username= username;
         this.phone = phone;
         this.authUserId = authUserId;
         this.audit = (audit != null) ? audit : new AuditModel();
