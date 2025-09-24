@@ -76,5 +76,8 @@ public class CreatePgRequest {
 
     // tags used for search
     private Set<@Size(max = 50) String> tags;
+    
+    @Size(max= 256)
+    private String imageUrl;
 }
 

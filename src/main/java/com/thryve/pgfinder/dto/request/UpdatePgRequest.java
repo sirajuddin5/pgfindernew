@@ -34,5 +34,7 @@ public class UpdatePgRequest {
     private Boolean verified;
 
     private Boolean featured;
+    
+    private String imageUrl;
 }
 

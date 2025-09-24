@@ -37,4 +37,5 @@ public class PgSummaryResponse {
     private Double avgRating;
     private Integer reviewCount;
     private Boolean verified;
+    private String imageUrl;
 }
